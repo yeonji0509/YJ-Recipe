@@ -1,68 +1,107 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>내 레시피 사이트</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      height: 100vh;
-      background-color: #fafafa;
-    }
-    #sidebar {
-      width: 220px;
-      background: #2c3e50;
-      color: white;
-      padding: 20px;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-    #sidebar h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-weight: 600;
-      font-size: 1.5em;
-    }
-    #sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-    #sidebar li {
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 4px;
-      margin-bottom: 6px;
-      transition: background 0.3s;
-    }
-    #sidebar li:hover, #sidebar li.active {
-      background: #e67e22;
-    }
-    #main {
-      flex: 1;
-      padding: 30px;
-      overflow-y: auto;
-    }
-    #main h2 {
-      margin-top: 0;
-      color: #2c3e50;
-    }
-    .recipe-item {
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #ddd;
-    }
-    .recipe-item h3 {
-      margin: 0 0 6px 0;
-      color: #e67e22;
-    }
-    .recipe-desc {
-      color: #555;
-      font-size: 0.95em;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>내 레시피 리스트</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0;
+    display: flex;
+    height: 100vh;
+    background: #fafafa;
+  }
+  #sidebar {
+    width: 180px;
+    background: #2c3e50;
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    position: fixed; /* 고정 */
+    height: 100vh;
+  }
+  #sidebar h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+  }
+  #sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #sidebar li {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    transition: background 0.3s;
+  }
+  #sidebar li:hover, #sidebar li.active {
+    background: #e67e22;
+  }
+  #main {
+    margin-left: 180px; /* 사이드바 너비만큼 밀기 */
+    padding: 20px 40px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  #search-container {
+    margin-bottom: 20px;
+  }
+  #search-input {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .category-section {
+    margin-bottom: 40px;
+  }
+  .category-title {
+    font-size: 1.6em;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    border-bottom: 3px solid #e67e22;
+    padding-bottom: 8px;
+  }
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+    gap: 20px;
+  }
+  .recipe-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+  }
+  .recipe-card:hover {
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.2);
+  }
+  .recipe-img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+  }
+  .recipe-info {
+    padding: 10px 15px;
+  }
+  .recipe-title {
+    font-size: 1.2em;
+    margin: 0 0 6px 0;
+    color: #e67e22;
+  }
+  .recipe-desc {
+    font-size: 0.9em;
+    color: #555;
+  }
+</style>
 </head>
 <body>
 
@@ -72,63 +111,109 @@
   </div>
 
   <div id="main">
-    <h2 id="category-title">카테고리를 선택하세요</h2>
+    <div id="search-container">
+      <input type="text" id="search-input" placeholder="요리명으로 검색하세요" />
+    </div>
     <div id="recipes-container"></div>
   </div>
 
-  <script>
-    // 예시 데이터 (나중에 recipes.json에서 불러올 수 있게 바꾸면 돼요)
-    const data = {
-      categories: ["국물", "김치찌개", "밥", "비빔밥", "반찬"],
-      recipes: [
-        {title: "김치찌개", category: "김치찌개", description: "매콤한 김치찌개 레시피입니다."},
-        {title: "된장찌개", category: "국물", description: "구수한 된장찌개를 만들어 봐요."},
-        {title: "비빔밥", category: "비빔밥", description: "건강한 비빔밥 만드는 법."},
-        {title: "계란말이", category: "반찬", description: "간단한 계란말이 레시피."}
-      ]
-    };
+<script>
+  const data = {
+    categories: ["국물", "김치찌개", "밥", "비빔밥", "반찬"],
+    recipes: [
+      {title: "김치찌개", category: "김치찌개", description: "매콤한 김치찌개 레시피입니다.", img:"https://via.placeholder.com/300x140?text=김치찌개"},
+      {title: "된장찌개", category: "국물", description: "구수한 된장찌개를 만들어 봐요.", img:"https://via.placeholder.com/300x140?text=된장찌개"},
+      {title: "비빔밥", category: "비빔밥", description: "건강한 비빔밥 만드는 법.", img:"https://via.placeholder.com/300x140?text=비빔밥"},
+      {title: "계란말이", category: "반찬", description: "간단한 계란말이 레시피.", img:"https://via.placeholder.com/300x140?text=계란말이"}
+    ]
+  };
 
-    const categoryList = document.getElementById('category-list');
-    const recipesContainer = document.getElementById('recipes-container');
-    const categoryTitle = document.getElementById('category-title');
+  const categoryList = document.getElementById('category-list');
+  const recipesContainer = document.getElementById('recipes-container');
+  const searchInput = document.getElementById('search-input');
 
-    // 카테고리 리스트 만들기
-    data.categories.forEach(cat => {
-      const li = document.createElement('li');
-      li.textContent = cat;
-      li.addEventListener('click', () => {
-        // active 클래스 토글
-        document.querySelectorAll('#sidebar li').forEach(el => el.classList.remove('active'));
-        li.classList.add('active');
+  // 현재 선택 카테고리 (초기값 없음 = 전체)
+  let currentCategory = null;
 
-        // 타이틀 바꾸기
-        categoryTitle.textContent = cat;
+  // 카테고리 리스트 만들기
+  data.categories.forEach(cat => {
+    const li = document.createElement('li');
+    li.textContent = cat;
+    li.addEventListener('click', () => {
+      // active 클래스 토글
+      document.querySelectorAll('#sidebar li').forEach(el => el.classList.remove('active'));
+      li.classList.add('active');
+      currentCategory = cat;
+      searchInput.value = ""; // 검색 초기화
+      renderRecipes();
+    });
+    categoryList.appendChild(li);
+  });
 
-        // 레시피 보여주기
-        showRecipes(cat);
-      });
-      categoryList.appendChild(li);
+  // 검색어 입력 시 필터링
+  searchInput.addEventListener('input', () => {
+    currentCategory = null; // 검색 시 카테고리 선택 해제
+    document.querySelectorAll('#sidebar li').forEach(el => el.classList.remove('active'));
+    renderRecipes();
+  });
+
+  function renderRecipes() {
+    recipesContainer.innerHTML = '';
+
+    // 필터링
+    const filtered = data.recipes.filter(r => {
+      const matchCategory = currentCategory ? r.category === currentCategory : true;
+      const matchSearch = searchInput.value.trim() === '' ? true : r.title.includes(searchInput.value.trim());
+      return matchCategory && matchSearch;
     });
 
-    // 레시피 보여주는 함수
-    function showRecipes(category) {
-      recipesContainer.innerHTML = '';
-      const filtered = data.recipes.filter(r => r.category === category);
-      if(filtered.length === 0) {
-        recipesContainer.innerHTML = '<p>해당 카테고리에 레시피가 없습니다.</p>';
-        return;
-      }
-      filtered.forEach(recipe => {
-        const div = document.createElement('div');
-        div.className = 'recipe-item';
-        div.innerHTML = `
-          <h3>${recipe.title}</h3>
-          <p class="recipe-desc">${recipe.description}</p>
-        `;
-        recipesContainer.appendChild(div);
+    // 카테고리별로 묶기
+    let grouped = {};
+    if(currentCategory){
+      grouped[currentCategory] = filtered;
+    } else {
+      data.categories.forEach(cat => {
+        grouped[cat] = filtered.filter(r => r.category === cat);
       });
     }
-  </script>
+
+    for(let cat in grouped){
+      if(grouped[cat].length === 0) continue;
+      // 카테고리 섹션
+      const section = document.createElement('div');
+      section.className = 'category-section';
+
+      // 카테고리 제목
+      const catTitle = document.createElement('h3');
+      catTitle.className = 'category-title';
+      catTitle.textContent = cat;
+      section.appendChild(catTitle);
+
+      // 레시피 그리드
+      const grid = document.createElement('div');
+      grid.className = 'recipes-grid';
+
+      grouped[cat].forEach(recipe => {
+        const card = document.createElement('div');
+        card.className = 'recipe-card';
+        card.innerHTML = `
+          <img src="${recipe.img}" alt="${recipe.title}" class="recipe-img" />
+          <div class="recipe-info">
+            <h4 class="recipe-title">${recipe.title}</h4>
+            <p class="recipe-desc">${recipe.description}</p>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      section.appendChild(grid);
+      recipesContainer.appendChild(section);
+    }
+  }
+
+  // 초기 렌더링
+  renderRecipes();
+</script>
 
 </body>
 </html>
