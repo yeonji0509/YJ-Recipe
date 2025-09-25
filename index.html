@@ -4,38 +4,131 @@
   <meta charset="UTF-8" />
   <title>내 레시피 사이트</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
-    h1 { color: #d35400; }
-    .category { margin-top: 20px; }
-    .recipe { margin-left: 20px; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      background-color: #fafafa;
+    }
+    #sidebar {
+      width: 220px;
+      background: #2c3e50;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    #sidebar h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-weight: 600;
+      font-size: 1.5em;
+    }
+    #sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    #sidebar li {
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      transition: background 0.3s;
+    }
+    #sidebar li:hover, #sidebar li.active {
+      background: #e67e22;
+    }
+    #main {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+    #main h2 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+    .recipe-item {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+    .recipe-item h3 {
+      margin: 0 0 6px 0;
+      color: #e67e22;
+    }
+    .recipe-desc {
+      color: #555;
+      font-size: 0.95em;
+    }
   </style>
 </head>
 <body>
-  <h1>내 레시피 목록</h1>
-  <div id="content"></div>
+
+  <div id="sidebar">
+    <h2>카테고리</h2>
+    <ul id="category-list"></ul>
+  </div>
+
+  <div id="main">
+    <h2 id="category-title">카테고리를 선택하세요</h2>
+    <div id="recipes-container"></div>
+  </div>
 
   <script>
-    fetch('recipes.json')
-      .then(response => response.json())
-      .then(data => {
-        const container = document.getElementById('content');
-        data.categories.forEach(category => {
-          const catDiv = document.createElement('div');
-          catDiv.className = 'category';
-          const catTitle = document.createElement('h2');
-          catTitle.textContent = category;
-          catDiv.appendChild(catTitle);
+    // 예시 데이터 (나중에 recipes.json에서 불러올 수 있게 바꾸면 돼요)
+    const data = {
+      categories: ["국물", "김치찌개", "밥", "비빔밥", "반찬"],
+      recipes: [
+        {title: "김치찌개", category: "김치찌개", description: "매콤한 김치찌개 레시피입니다."},
+        {title: "된장찌개", category: "국물", description: "구수한 된장찌개를 만들어 봐요."},
+        {title: "비빔밥", category: "비빔밥", description: "건강한 비빔밥 만드는 법."},
+        {title: "계란말이", category: "반찬", description: "간단한 계란말이 레시피."}
+      ]
+    };
 
-          data.recipes.filter(r => r.category === category).forEach(recipe => {
-            const recipeDiv = document.createElement('div');
-            recipeDiv.className = 'recipe';
-            recipeDiv.textContent = recipe.title;
-            catDiv.appendChild(recipeDiv);
-          });
+    const categoryList = document.getElementById('category-list');
+    const recipesContainer = document.getElementById('recipes-container');
+    const categoryTitle = document.getElementById('category-title');
 
-          container.appendChild(catDiv);
-        });
+    // 카테고리 리스트 만들기
+    data.categories.forEach(cat => {
+      const li = document.createElement('li');
+      li.textContent = cat;
+      li.addEventListener('click', () => {
+        // active 클래스 토글
+        document.querySelectorAll('#sidebar li').forEach(el => el.classList.remove('active'));
+        li.classList.add('active');
+
+        // 타이틀 바꾸기
+        categoryTitle.textContent = cat;
+
+        // 레시피 보여주기
+        showRecipes(cat);
       });
+      categoryList.appendChild(li);
+    });
+
+    // 레시피 보여주는 함수
+    function showRecipes(category) {
+      recipesContainer.innerHTML = '';
+      const filtered = data.recipes.filter(r => r.category === category);
+      if(filtered.length === 0) {
+        recipesContainer.innerHTML = '<p>해당 카테고리에 레시피가 없습니다.</p>';
+        return;
+      }
+      filtered.forEach(recipe => {
+        const div = document.createElement('div');
+        div.className = 'recipe-item';
+        div.innerHTML = `
+          <h3>${recipe.title}</h3>
+          <p class="recipe-desc">${recipe.description}</p>
+        `;
+        recipesContainer.appendChild(div);
+      });
+    }
   </script>
+
 </body>
 </html>
