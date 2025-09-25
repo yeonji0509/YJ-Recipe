@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>내 레시피 사이트</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+    h1 { color: #d35400; }
+    .category { margin-top: 20px; }
+    .recipe { margin-left: 20px; }
+  </style>
+</head>
+<body>
+  <h1>내 레시피 목록</h1>
+  <div id="content"></div>
+
+  <script>
+    fetch('recipes.json')
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('content');
+        data.categories.forEach(category => {
+          const catDiv = document.createElement('div');
+          catDiv.className = 'category';
+          const catTitle = document.createElement('h2');
+          catTitle.textContent = category;
+          catDiv.appendChild(catTitle);
+
+          data.recipes.filter(r => r.category === category).forEach(recipe => {
+            const recipeDiv = document.createElement('div');
+            recipeDiv.className = 'recipe';
+            recipeDiv.textContent = recipe.title;
+            catDiv.appendChild(recipeDiv);
+          });
+
+          container.appendChild(catDiv);
+        });
+      });
+  </script>
+</body>
+</html>
