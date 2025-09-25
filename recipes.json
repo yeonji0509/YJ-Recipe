@@ -1,0 +1,19 @@
+{
+  "categories": ["국물", "밥", "반찬"],
+  "recipes": [
+    {
+      "id": "kimchi-stew",
+      "title": "김치찌개",
+      "category": "국물",
+      "ingredients": ["김치", "돼지고기", "두부"],
+      "instructions": "1. 돼지고기를 볶는다. 2. 김치를 넣고 끓인다..."
+    },
+    {
+      "id": "bibimbap",
+      "title": "비빔밥",
+      "category": "밥",
+      "ingredients": ["밥", "나물", "고추장"],
+      "instructions": "1. 밥 위에 나물을 얹는다. 2. 고추장과 비벼 먹는다."
+    }
+  ]
+}
